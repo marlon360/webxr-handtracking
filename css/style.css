@@ -1,0 +1,83 @@
+body, html {
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    background: #f4f4f4;
+    font-family: sans-serif;
+    color: rgb(21, 21, 21);
+    line-height: 150%;
+}
+
+main {
+    max-width: 1000px;
+    margin: 2em auto;
+    padding: 0 4em;
+    display: flex;
+    flex-direction: column;
+}
+
+.title {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+.title h1 {
+    margin: 0.2em 0;
+    line-height: 120%;
+}
+.title h4 {
+    margin: 0.8em 0;
+    padding-left: 0.2em;
+    font-weight: 500;
+}
+
+.title h4 a {
+    color: rgb(21, 21, 21);
+}
+
+h2 {
+    margin: 0.5em;
+}
+ol li {
+    padding-top: 0.2em;
+}
+ol {
+    margin: 1em 0;
+}
+ol ol {
+    margin: 0.4em 0;
+}
+
+.example a {
+    display: inline-block;
+    padding: 1em 1.4em;
+    margin: 1em 0;
+    background: rgb(45, 129, 255);
+    border-radius: 6px;
+    text-decoration: none;
+    color: white;
+    transition: all 250ms;
+}
+
+.example a:hover {
+    background: rgb(34, 121, 197);
+}
+
+.example {
+    background: white;
+    border: solid rgb(189, 189, 189) 2px;
+    border-radius: 20px;
+    padding: 1em 2em;
+    margin: 1em 0;
+}
+
+.example h2 {
+    margin: 1em 0;
+}
+.example ul {
+    margin: 1em 0;
+}
+.example ul li {
+    padding-top: 0.2em;
+}

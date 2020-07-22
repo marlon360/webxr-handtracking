@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+			canvas { display: block; }
+		</style>
+	</head>
+	<body>
+		<script src="js/three.js"></script>
+		<script type="module">
+
+            import {VRButton} from './js/VRButton.js';
+
+            // init scene with background
+            var scene = new THREE.Scene();
+            scene.background = new THREE.Color( 0x808080 );
+
+            // init camera
+            var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+            camera.position.y = 0.5;
+
+            // init renderer
+            var renderer = new THREE.WebGLRenderer();
+            renderer.setSize( window.innerWidth, window.innerHeight );
+
+
+            var xrRefSpace;
+            let boxes_left = [];
+            let boxes_right = [];
+            // skeleton for hands
+            let boxes = { left: boxes_left, right: boxes_right};
+
+
+            function addBox(x, y, z, box_list, offset) {
+                var geometry = new THREE.BoxGeometry(1, 1, 1);
+                var material = new THREE.MeshBasicMaterial();
+                material.color.setRGB(0, 0.2, 0.7);
+                var cube = new THREE.Mesh( geometry, material );
+                cube.castShadow = true;
+                box_list.push({
+                    mesh: cube,
+                    position: [x, y, z],
+                    offset: offset
+                });
+            }
+
+            function initHands() {
+                for (const box of boxes_left) {
+                    scene.remove(box.mesh);
+                }
+                for (const box of boxes_right) {
+                    scene.remove(box.mesh);
+                }
+                boxes_left = [];
+                boxes_right = [];
+                boxes = { left: boxes_left, right: boxes_right};
+                if (XRHand) {
+                    for (let i = 0; i <= XRHand.LITTLE_PHALANX_TIP; i++) {
+                        addBox(0, 0, 0, boxes_left, i);
+                        addBox(0, 0, 0,  boxes_right, i);
+                    }
+                }
+            }
+
+            renderer.xr.onSessionStartedCallback = (session) => {
+
+                // create skelton meshes
+                initHands();
+
+                // get xrRefSpace
+                session.requestReferenceSpace('local').then((refSpace) => {
+                    xrRefSpace = refSpace.getOffsetReferenceSpace(new XRRigidTransform({x: 0, y: 1.5, z: 0}));
+                });
+            };
+
+            // add canvas to dom
+            document.body.appendChild( renderer.domElement );
+            // add enter vr button to dom
+            document.body.appendChild( VRButton.createButton( renderer ) );
+
+            // set color and shadows
+            renderer.outputEncoding = THREE.sRGBEncoding;
+            renderer.shadowMap.enabled = true;
+            
+            // enable xr
+            renderer.xr.enabled = true;
+            
+
+            var geometry = new THREE.SphereGeometry(0.2, 32, 32);
+            var material = new THREE.MeshStandardMaterial({color:  0xff4466, roughness: 0.8, metalness: 0.2});
+            
+            var cube = new THREE.Mesh( geometry, material );
+            cube.position.z = -0.5;
+            cube.position.y = 1;
+            cube.castShadow = true;
+            scene.add( cube );
+
+            
+            function createEnvironment() {
+                var geometry = new THREE.PlaneBufferGeometry( 4, 4 );
+                var material = new THREE.MeshStandardMaterial( {
+                    color: 0xeeeeee,
+                    roughness: 1.0,
+                    metalness: 0.0
+                });
+                var floor = new THREE.Mesh( geometry, material );
+                floor.rotation.x = - Math.PI / 2;
+                floor.receiveShadow = true;
+                scene.add( floor );
+
+                scene.add( new THREE.HemisphereLight( 0x808080, 0x606060 ) );
+
+                var light = new THREE.DirectionalLight( 0xffffff );
+                light.position.set( 0, 6, 0 );
+                light.castShadow = true;
+                light.shadow.camera.top = 2;
+                light.shadow.camera.bottom = - 2;
+                light.shadow.camera.right = 2;
+                light.shadow.camera.left = - 2;
+                light.shadow.mapSize.set( 4096, 4096 );
+                scene.add( light );
+            }
+
+            function updateInputSources(session, frame, refSpace) {
+                for (let inputSource of session.inputSources) {
+                    if (!inputSource.hand) {
+                        continue;
+                    } else {
+                        for (const box of boxes[inputSource.handedness]) {
+                            let jointPose = null;
+                            if (inputSource.hand[box.offset] !== null) {
+                                jointPose = frame.getJointPose(inputSource.hand[box.offset], refSpace);
+                            }
+                            if (jointPose !== null) {
+                                scene.add(box.mesh);
+                                box.mesh.position.set(jointPose.transform.position.x, jointPose.transform.position.y + 1.5, jointPose.transform.position.z);
+                                const q = new THREE.Quaternion(jointPose.transform.orientation.x, jointPose.transform.orientation.y, jointPose.transform.orientation.z, jointPose.transform.orientation.w);
+                                box.mesh.quaternion.copy(q);
+                                box.mesh.scale.set(jointPose.radius, jointPose.radius, jointPose.radius);
+                            } else {
+                                scene.remove(box.mesh);
+                            }
+                        }
+                    }
+                }
+            }
+
+            function grabCheckLeft() {
+                const indexTip = boxes.left[8].mesh;
+                const thumbTip = boxes.left[3].mesh;
+                const distance = indexTip.position.distanceTo(thumbTip.position);
+                return distance < 0.037;
+            }
+            function grabCheckRight() {
+                const indexTip = boxes.right[8].mesh;
+                const thumbTip = boxes.right[3].mesh;
+                const distance = indexTip.position.distanceTo(thumbTip.position);
+                return distance < 0.037;
+            }
+
+            let offsetLeft = null;
+            let offsetRight = null;
+
+            renderer.setAnimationLoop( function (time, frame) {
+                if (frame != null && xrRefSpace != null) {
+                    updateInputSources(renderer.xr.getSession(), frame, xrRefSpace);
+
+                    cube.geometry.computeBoundingBox();
+                    var sphereBBox = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
+                    sphereBBox.setFromObject(cube);
+
+                    if (grabCheckLeft()) {
+                        if (sphereBBox.containsPoint(boxes.left[8].mesh.position)) {
+                            if (offsetLeft === null) {
+                                offsetLeft = new THREE.Vector3().subVectors(boxes.left[8].mesh.position, cube.position);
+                            }
+                            cube.position.set(boxes.left[8].mesh.position.x - offsetLeft.x, boxes.left[8].mesh.position.y - offsetLeft.y, boxes.left[8].mesh.position.z - offsetLeft.z);
+                        }
+                    } else {
+                        offsetLeft = null;
+                    }
+                    if (grabCheckRight()) {
+                        if (sphereBBox.containsPoint(boxes.right[8].mesh.position)) {
+                            if (offsetRight === null) {
+                                offsetRight = new THREE.Vector3().subVectors(boxes.right[8].mesh.position, cube.position);
+                            }
+                            cube.position.set(boxes.right[8].mesh.position.x - offsetRight.x, boxes.right[8].mesh.position.y - offsetRight.y, boxes.right[8].mesh.position.z - offsetRight.z);
+                        }
+                    } else {
+                        offsetRight = null;
+                    }
+                }
+                renderer.render( scene, camera );
+            } );
+
+            createEnvironment();
+
+		</script>
+	</body>
+</html>
