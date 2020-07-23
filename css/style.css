@@ -18,6 +18,12 @@ main {
     flex-direction: column;
 }
 
+@media only screen and (max-width: 600px) {
+    main {
+        padding: 0 1.8em;
+    }
+}
+
 .title {
     margin-top: 1em;
     margin-bottom: 1em;
