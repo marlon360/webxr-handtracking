@@ -148,17 +148,11 @@
                 }
             }
 
-            function grabCheckLeft() {
-                const indexTip = boxes.left[8].mesh;
-                const thumbTip = boxes.left[3].mesh;
+            function grabCheck(hand) {
+                const indexTip = hand[XRHand.INDEX_PHALANX_TIP].mesh;
+                const thumbTip = hand[XRHand.THUMB_PHALANX_TIP].mesh;
                 const distance = indexTip.position.distanceTo(thumbTip.position);
-                return distance < 0.037;
-            }
-            function grabCheckRight() {
-                const indexTip = boxes.right[8].mesh;
-                const thumbTip = boxes.right[3].mesh;
-                const distance = indexTip.position.distanceTo(thumbTip.position);
-                return distance < 0.037;
+                return distance < 0.01;
             }
 
             let offsetLeft = null;
@@ -172,22 +166,22 @@
                     var sphereBBox = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
                     sphereBBox.setFromObject(cube);
 
-                    if (grabCheckLeft()) {
-                        if (sphereBBox.containsPoint(boxes.left[8].mesh.position)) {
+                    if (grabCheck(boxes.left)) {
+                        if (sphereBBox.containsPoint(boxes.left[XRHand.INDEX_PHALANX_TIP].mesh.position)) {
                             if (offsetLeft === null) {
-                                offsetLeft = new THREE.Vector3().subVectors(boxes.left[8].mesh.position, cube.position);
+                                offsetLeft = new THREE.Vector3().subVectors(boxes.left[XRHand.INDEX_PHALANX_TIP].mesh.position, cube.position);
                             }
-                            cube.position.set(boxes.left[8].mesh.position.x - offsetLeft.x, boxes.left[8].mesh.position.y - offsetLeft.y, boxes.left[8].mesh.position.z - offsetLeft.z);
+                            cube.position.set(boxes.left[XRHand.INDEX_PHALANX_TIP].mesh.position.x - offsetLeft.x, boxes.left[XRHand.INDEX_PHALANX_TIP].mesh.position.y - offsetLeft.y, boxes.left[XRHand.INDEX_PHALANX_TIP].mesh.position.z - offsetLeft.z);
                         }
                     } else {
                         offsetLeft = null;
                     }
-                    if (grabCheckRight()) {
+                    if (grabCheck(boxes.right)) {
                         if (sphereBBox.containsPoint(boxes.right[8].mesh.position)) {
                             if (offsetRight === null) {
-                                offsetRight = new THREE.Vector3().subVectors(boxes.right[8].mesh.position, cube.position);
+                                offsetRight = new THREE.Vector3().subVectors(boxes.right[XRHand.INDEX_PHALANX_TIP].mesh.position, cube.position);
                             }
-                            cube.position.set(boxes.right[8].mesh.position.x - offsetRight.x, boxes.right[8].mesh.position.y - offsetRight.y, boxes.right[8].mesh.position.z - offsetRight.z);
+                            cube.position.set(boxes.right[XRHand.INDEX_PHALANX_TIP].mesh.position.x - offsetRight.x, boxes.right[XRHand.INDEX_PHALANX_TIP].mesh.position.y - offsetRight.y, boxes.right[XRHand.INDEX_PHALANX_TIP].mesh.position.z - offsetRight.z);
                         }
                     } else {
                         offsetRight = null;
