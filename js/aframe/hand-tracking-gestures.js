@@ -15,7 +15,7 @@ AFRAME.registerComponent('hand-tracking-gestures', {
                     console.log("pinched");
                     this.isPinched = true;
                     this.el.emit('started-pinch', {
-                        joint: this.handTracking.hand[XRHand.INDEX_PHALANX_TIP]
+                        joint: this.handTracking.hand[XRHand.INDEX_PHALANX_TIP].object3D
                     });
                 }
             }
@@ -30,14 +30,14 @@ AFRAME.registerComponent('hand-tracking-gestures', {
     },
 
     pinchCheck: function (hand) {
-        const indexTip = hand[XRHand.INDEX_PHALANX_TIP];
-        const thumbTip = hand[XRHand.THUMB_PHALANX_TIP];
+        const indexTip = hand[XRHand.INDEX_PHALANX_TIP].object3D;
+        const thumbTip = hand[XRHand.THUMB_PHALANX_TIP].object3D;
         const distance = indexTip.position.distanceTo(thumbTip.position);
         return distance < 0.01;
     },
     pinchReleaseCheck: function (hand) {
-        const indexTip = hand[XRHand.INDEX_PHALANX_TIP];
-        const thumbTip = hand[XRHand.THUMB_PHALANX_TIP];
+        const indexTip = hand[XRHand.INDEX_PHALANX_TIP].object3D;
+        const thumbTip = hand[XRHand.THUMB_PHALANX_TIP].object3D;
         const distance = indexTip.position.distanceTo(thumbTip.position);
         return distance > 0.03;
     },

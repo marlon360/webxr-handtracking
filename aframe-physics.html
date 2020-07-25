@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hand Tracking in A-Frame</title>
+    <script src="js/aframe-master.js"></script>
+    <script src="js/aframe/aframe-physics-system.js"></script>
+    <script src="js/aframe/hand-tracking.js"></script>
+    <script src="js/aframe/hand-tracking-gestures.js"></script>
+    <script src="js/aframe/slider.component.js"></script>
+    <script src="js/aframe/toggle.component.js"></script>
+</head>
+<body>
+    <a-scene webxr="optionalFeatures: hand-tracking" physics="debug: false">
+
+        <a-entity light="type: directional; color: #FFF; intensity: 0.7" position="-1 1 0"></a-entity>
+        <a-entity light="type: hemisphere; color: #fff; groundColor: #ff; intensity: 0.5"></a-entity>
+
+        <a-plane static-body position="0 0 -1" rotation="-90 0 0" width="6" height="6" color="#7BC8A4"></a-plane>
+
+        <a-box static-body position="0 0.5 -0.8" width="1" height="0.4" color="#bcbcbc"></a-box>
+        <a-box dynamic-body position="0.2 0.7 -0.6" rotation="0 2 0" scale="0.1 0.1 0.1" color="#4CC3D9"></a-box>
+        <a-box dynamic-body position="0.1 0.7 -0.6" rotation="0 20 0" scale="0.1 0.1 0.1" color="#4CC3D9"></a-box>
+        <a-box dynamic-body position="0.3 0.7 -0.6" scale="0.1 0.1 0.1" color="#4CC3D9"></a-box>
+        <a-box dynamic-body position="0 0.7 -0.6" rotation="0 30 0" scale="0.05 0.05 0.05" color="#4CC3D9"></a-box>
+        <a-box dynamic-body position="0 0.7 -0.6" scale="0.1 0.1 0.1" color="#4CC3D9"></a-box>
+        <a-box dynamic-body position="0 0.7 -0.8" rotation="0 10 0" scale="0.1 0.1 0.1" color="#4CC3D9"></a-box>
+        <a-box dynamic-body position="-0.2 0.7 -0.8" scale="0.05 0.05 0.05" color="#4CC3D9"></a-box>
+        <a-box dynamic-body position="-0.1 0.7 -0.8" scale="0.1 0.1 0.1" color="#4CC3D9"></a-box>
+        <a-box dynamic-body position="0 0.7 -0.8" scale="0.1 0.1 0.1" color="#4CC3D9"></a-box>
+
+        <a-cylinder dynamic-body="shape: cylinder;" position="-0.4 0.7 -0.5" scale="0.05 0.1 0.05" rotation="90 0 0" color="#4CC3D9"></a-cylinder>
+        <a-cylinder dynamic-body="shape: cylinder;" position="0.4 0.7 -0.9" scale="0.05 0.1 0.05" rotation="90 0 0" color="#4CC3D9"></a-cylinder>
+
+        <a-box id="anchor" scale="0.2 0.1 0.1" position="0 1.4 -0.7" color="#efefef" static-body></a-box>
+        <a-sphere id="ball" scale="0.1 0.1 0.1" position="0 1 -0.7" color="#EF2D5E" dynamic-body="shape: sphere; sphereRadius: 0.1" constraint="target: #anchor; type: hinge;pivot: 0 0.3 0">
+            <a-cylinder scale="0.1 2 0.1" color="#EF2D5E" position="0 1.5 0"></a-cylinder>
+        </a-sphere>
+        
+
+
+
+        <a-entity hand-tracking="hand: left; physicsEnabled: true" hand-tracking-gestures></a-entity>
+        <a-entity hand-tracking="hand: right; physicsEnabled: true" hand-tracking-gestures></a-entity>
+
+        <a-sky color="#ECECEC"></a-sky>
+    </a-scene>
+</body>
+<script>
+    const box = document.querySelector("a-box");
+    const boxSlider = document.querySelector("#box-slider");
+    boxSlider.addEventListener('change', (evt) => {
+        var newvalue = evt.detail.value;
+        box.setAttribute("rotation", `0 ${newvalue} 0`);
+    });
+
+    const sphere = document.querySelector("a-sphere");
+    const sphereToggle = document.querySelector("#sphere-toggle");
+    sphereToggle.addEventListener('change', (evt) => {
+        sphere.setAttribute("visible", evt.detail.active);
+    });
+
+    const cylinder = document.querySelector("a-cylinder");
+    const cylinderSlider = document.querySelector("#cylinder-slider");
+    cylinderSlider.addEventListener('change', (evt) => {
+        var newvalue = Math.round( evt.detail.value);
+        cylinder.setAttribute("color", `#${newvalue.toString(16)}C65D`);
+    });
+
+
+</script>
+</html>

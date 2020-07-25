@@ -4,6 +4,7 @@ AFRAME.registerComponent('hand-tracking', {
         color: {default: 'white', type: 'color'},
         segmentSizeMultiplier: {default: 0.9, type: 'number'},
         hand: { default: 'left', oneOf: ['left', 'right'] },
+        physicsEnabled: { default: false }
     },
 
     init: function() {
@@ -12,11 +13,21 @@ AFRAME.registerComponent('hand-tracking', {
 
     createMesh: function () {
         this.hand = this.system.hands[this.data.hand].map(() => {
-            var geometry = new THREE.SphereBufferGeometry(1 * this.data.segmentSizeMultiplier, 16, 16);
-            var material = new THREE.MeshStandardMaterial({color: this.data.color, roughness: 0.8});
-            var mesh = new THREE.Mesh( geometry, material );
-            this.el.sceneEl.object3D.add(mesh);
-            return mesh;
+            const joint = document.createElement('a-sphere');
+            joint.setAttribute('geometry', {
+                radius: 1 * this.data.segmentSizeMultiplier
+            });
+            joint.setAttribute('material', {
+                color: this.data.color
+            });
+            if (this.data.physicsEnabled) {
+                joint.setAttribute('static-body',{
+                    shape: 'sphere',
+                    sphereRadius: 0.01
+                });
+            }
+            this.el.appendChild(joint);
+            return joint;
         });
     },
 
@@ -27,7 +38,7 @@ AFRAME.registerComponent('hand-tracking', {
         if (this.hand != null) {
             for (let index = 0; index < this.system.hands[this.data.hand].length; index++) {
                 const joint = this.system.hands[this.data.hand][index];
-                const mesh = this.hand[index];
+                const mesh = this.hand[index].object3D;
                 if (joint.visible) {
                     mesh.visible = true;
                     mesh.position.set(joint.position.x, joint.position.y + 1.5, joint.position.z);
@@ -37,6 +48,11 @@ AFRAME.registerComponent('hand-tracking', {
                     if (joint.radius == null) {
                         const lastJoint = this.system.hands[this.data.hand][index - 1];
                         radius = lastJoint.radius != null ? lastJoint.radius * 0.9 : null;
+                    }
+                    if (this.data.physicsEnabled) {
+                        this.hand[index].setAttribute('static-body',{
+                            sphereRadius: radius * 0.001
+                        });
                     }
                     mesh.scale.set(radius, radius, radius);
                 } else {
