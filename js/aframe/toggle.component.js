@@ -39,7 +39,7 @@ AFRAME.registerComponent('toggle', {
 
         this.el.setObject3D('mesh', this.chassis);
     
-        this.controllers = Array.prototype.slice.call(document.querySelectorAll('[hand-tracking-gestures]'));
+        this.controllers = Array.prototype.slice.call(document.querySelectorAll('.hand'));
 
         const knobURL = "/models/knob.glb";
         loader.load( knobURL,(gltf) => {

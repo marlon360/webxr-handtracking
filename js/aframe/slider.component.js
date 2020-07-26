@@ -36,7 +36,7 @@ AFRAME.registerComponent('slider', {
 
         this.el.setObject3D('mesh', chassis);
     
-        this.controllers = Array.prototype.slice.call(document.querySelectorAll('[hand-tracking-gestures]'));
+        this.controllers = Array.prototype.slice.call(document.querySelectorAll('.hand'));
 
         this.setValue(this.data.value);
 
@@ -46,6 +46,7 @@ AFRAME.registerComponent('slider', {
             this.knob = scene.children[0];
             this.knob.scale.set(0.2,0.2, 0.2)
             this.knob.rotation.set(0, Math.PI, 0)
+            this.knob.position.set(0, -0.008, 0)
             this.knob.material = this.knobMaterial;
             this.lever.add( this.knob );
 
@@ -79,9 +80,11 @@ AFRAME.registerComponent('slider', {
     
         var handBB = new THREE.Box3().setFromObject(hand);
         var leverBB = new THREE.Box3().setFromObject(lever);
+
         var collision = handBB.intersectsBox(leverBB);
     
         if (collision) {
+          console.log("collision");
           let handWorld = new THREE.Vector3();
           hand.getWorldPosition(handWorld);
           let knobWorld = new THREE.Vector3();;
