@@ -57,7 +57,7 @@ ol ol {
 
 .example a {
     display: inline-block;
-    padding: 1em 1.4em;
+    padding: 0.8em 1.2em;
     margin: 1em 0;
     background: rgb(45, 129, 255);
     border-radius: 6px;
@@ -68,6 +68,14 @@ ol ol {
 
 .example a:hover {
     background: rgb(34, 121, 197);
+}
+
+.example a.video {
+    background: rgb(52, 141, 218);
+    float: right;
+}
+.example a.video:hover {
+    background: rgb(11, 113, 203);
 }
 
 .example {
