@@ -62,10 +62,20 @@
 
 
     function updateColor() {
-        sphere.setAttribute("color", `#${red.toString(16) + green.toString(16) + blue.toString(16)}`);
+        sphere.setAttribute("color", `#${decimalToHex(red) + decimalToHex(green) + decimalToHex(blue)}`);
     }
 
     updateColor();
+
+    function decimalToHex(d, padding = 2) {
+        var hex = Number(d).toString(16);
+
+        while (hex.length < padding) {
+            hex = "0" + hex;
+        }
+
+        return hex;
+    }
 
 
 </script>
