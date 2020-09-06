@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Drawing</title>
+	<script src="js/aframe-master.js"></script>
+	<script src="https://unpkg.com/aframe-environment-component@1.1.0/dist/aframe-environment-component.min.js"></script>
+    <script src="js/aframe/hand-tracking-mesh.js"></script>
+    <script src="js/aframe/hand-tracking-gestures-mesh.js"></script>
+    <script src="js/TubePainter.js"></script>
+    <script src="js/aframe/painter.js"></script>
+    <script src="js/aframe/painter-color-picker.js"></script>
+    <script src="js/aframe/finger-raycaster.js"></script>
+</head>
+<body>
+    <a-scene webxr="optionalFeatures: hand-tracking" environment="groundTexture: none; grid: 1x1; gridColor: #222; ground: flat; lighting: none; skyType: color; skyColor: #222; fog: 0.97; horizonColor: #222; groundColor: #333; groundColor2: #fff">
+
+		<a-entity light="type: spot; color: #ffffff; intensity: 0.9; castShadow: false" position="0 2 0" rotation="-90 0 0"></a-entity>
+		<a-entity light="type: ambient; color: #ffffff; intensity: 0.6;" position="0 3 0"></a-entity>
+
+        <a-entity id="leftHand" class="hand"  painter-color-picker hand-tracking-mesh="hand: left"></a-entity>
+        <a-entity class="hand" finger-raycaster painter hand-tracking-mesh="hand: right" hand-tracking-gestures-mesh></a-entity>
+    </a-scene>
+</body>
+</html>
